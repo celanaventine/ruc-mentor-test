@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人大社院“天选导师”匹配测试</title>
+    <style>
+        /* 基础样式复刻截图风格 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px 10px;
+        }
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* 表单区域样式 */
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            background-color: #fff;
+            appearance: none; /* 移除默认下拉箭头 */
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 1em;
+        }
+        /* MBTI输入框不需要下拉箭头 */
+        input[type="text"] {
+            background-image: none;
+            text-transform: uppercase;
+        }
+        
+        /* 按钮样式 */
+        .btn-submit {
+            display: block;
+            margin: 40px auto 0;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 12px 40px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+        .btn-submit:hover { opacity: 0.8; }
+
+        /* 答题区域样式 */
+        #quiz-screen, #result-screen {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #222;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .option-btn:hover {
+            background: #e2e6ea;
+            border-color: #dae0e5;
+        }
+
+        /* 结果区域样式 */
+        .result-header { text-align: center; margin-bottom: 30px; }
+        .metaphysics-text {
+            font-size: 0.95rem;
+            color: #666;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-style: italic;
+            border-left: 4px solid #000;
+        }
+        .teacher-card {
+            border: 2px solid #000;
+            border-radius: 12px;
+            padding: 25px;
+            background: #fff;
+        }
+        .t-name { font-size: 2rem; font-weight: bold; margin: 0 0 5px 0; color: #000; }
+        .t-fields { font-size: 0.95rem; color: #555; margin-bottom: 20px; font-weight: bold; }
+        .t-desc { font-size: 1.05rem; line-height: 1.7; color: #333; }
+        
+        /* 新增：排行榜与底部按钮样式 */
+        .ranking-section { margin-top: 35px; text-align: left; }
+        .ranking-section h3 { font-size: 1.15rem; margin-bottom: 15px; color: #000; font-weight: bold; }
+        .ranking-list { list-style: none; padding: 0; margin: 0; background: #fff; border-radius: 8px; }
+        .ranking-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #f0f0f0; font-size: 1.05rem; }
+        .ranking-item:last-child { border-bottom: none; }
+        .rank-name { font-weight: 500; color: #222; }
+        .rank-score { color: #666; font-size: 0.95rem; }
+        
+        .btn-group { display: flex; justify-content: center; gap: 15px; margin-top: 40px; }
+        .btn-dark { background-color: #000; color: #fff; border: none; padding: 12px 30px; font-size: 1rem; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s;}
+        .btn-dark:hover { opacity: 0.8; }
+        .btn-light { background-color: #f1f3f5; color: #333; border: none; padding: 12px 30px; font-size: 1rem; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        .btn-light:hover { background-color: #e2e6ea; }
+        
+        .error-msg { color: red; font-size: 0.9rem; margin-top: 5px; display: none; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- 阶段一：玄学信息采集表单 -->
+    <div id="form-screen">
+        <div class="form-group">
+            <label>你的星座</label>
+            <select id="input-zodiac">
+                <option value="白羊座">白羊座 (Aries)</option>
+                <option value="金牛座">金牛座 (Taurus)</option>
+                <option value="双子座">双子座 (Gemini)</option>
+                <option value="巨蟹座">巨蟹座 (Cancer)</option>
+                <option value="狮子座">狮子座 (Leo)</option>
+                <option value="处女座">处女座 (Virgo)</option>
+                <option value="天秤座">天秤座 (Libra)</option>
+                <option value="天蝎座">天蝎座 (Scorpio)</option>
+                <option value="射手座">射手座 (Sagittarius)</option>
+                <option value="摩羯座">摩羯座 (Capricorn)</option>
+                <option value="水瓶座">水瓶座 (Aquarius)</option>
+                <option value="双鱼座">双鱼座 (Pisces)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>你的MBTI</label>
+            <input type="text" id="input-mbti" placeholder="例如 INFP" maxlength="4">
+            <div id="mbti-error" class="error-msg">请输入正确的4位MBTI字母！</div>
+        </div>
+
+        <div class="form-group">
+            <label>你的血型</label>
+            <select id="input-blood">
+                <option value="A型">A</option>
+                <option value="B型">B</option>
+                <option value="AB型">AB</option>
+                <option value="O型">O</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>你的八字日主</label>
+            <select id="input-bazi">
+                <option value="甲木">甲木</option>
+                <option value="乙木">乙木</option>
+                <option value="丙火">丙火</option>
+                <option value="丁火">丁火</option>
+                <option value="戊土">戊土</option>
+                <option value="己土">己土</option>
+                <option value="庚金">庚金</option>
+                <option value="辛金">辛金</option>
+                <option value="壬水">壬水</option>
+                <option value="癸水">癸水</option>
+            </select>
+        </div>
+
+        <button class="btn-submit" onclick="startQuiz()">开始匹配</button>
+    </div>
+
+    <!-- 阶段二：学术偏好测试（隐式测试） -->
+    <div id="quiz-screen">
+        <div style="font-size: 0.9rem; color: #888; margin-bottom: 10px;">进度: <span id="quiz-progress">1/6</span></div>
+        <div id="question-text" class="question-text">问题内容加载中...</div>
+        <div id="options-container">
+            <!-- 选项按钮由JS生成 -->
+        </div>
+    </div>
+
+    <!-- 阶段三：结果呈现 -->
+    <div id="result-screen">
+        <div class="result-header">
+            <h2>🔮 命定导师匹配报告</h2>
+        </div>
+        
+        <div id="metaphysics-insight" class="metaphysics-text">
+            生成中...
+        </div>
+
+        <div class="teacher-card">
+            <h3 id="res-name" class="t-name">导师姓名</h3>
+            <div id="res-fields" class="t-fields">学术领域</div>
+            <div id="res-desc" class="t-desc">导师评语</div>
+        </div>
+
+        <!-- 新增：排行榜区块 -->
+        <div class="ranking-section">
+            <h3>匹配度排行榜</h3>
+            <ul id="ranking-list" class="ranking-list">
+                <!-- 列表项由JS生成 -->
+            </ul>
+        </div>
+
+        <!-- 新增：双按钮组合 -->
+        <div class="btn-group">
+            <button class="btn-dark" onclick="location.reload()">重新测试</button>
+            <button class="btn-light" onclick="shareResult()">分享结果</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ==========================================
+    // 数据库配置区
+    // 将老师分为5个隐形学术流派，方便根据答题结果匹配
+    // A: 宏观/定量/结构  B: 微观/质性/边缘/情感  C: 理论/思辨/历史  D: 应用/政策/社工  E: 人类学/乡土/田野
+    // ==========================================
+    const teachers = {
+        "A": [
+            { name: "冯仕政", fields: "历史社会学、政治社会学、组织社会学", desc: "宏观视野与深邃理论的结合。如果你喜欢提出宏大的经验性puzzle并进行历史维度的推演，冯老师的严密逻辑绝对能让你受益匪浅。" },
+            { name: "李路路", fields: "社会分层与流动、组织社会学", desc: "社会结构研究的泰斗。注重从经验数据中提炼出强有力的结构性解释，带你用最冷峻的视角俯瞰阶层流动的真相。" },
+            { name: "齐亚强", fields: "人口社会学、医学社会学、定量方法", desc: "数据的守门人。如果你崇尚用硬核的数据和精妙的模型去击破那些经不起推敲的常识替代性理论，这里是最好的归宿。" },
+            { name: "王卫东", fields: "教育社会学、社会调查方法", desc: "CGSS的基石守护者。他能指导你如何在海量的社会调查数据中，挖掘出具有中国本土意义的经验性悖论。" },
+            { name: "何欣", fields: "社会网络、量化分析", desc: "严谨求实，擅长在复杂的网络数据与数学模型中寻找确切的因果关系与社会学规律。" },
+            { name: "李丁", fields: "社会流动、人口迁移、定量方法", desc: "定量分析的高手，擅长教你如何将一个模糊的社会现象，转化为可以用统计模型严格检验的理论假设。" },
+            { name: "谢桂华", fields: "流动人口、社会不平等", desc: "靠扎实的数据说话。对于城乡流动中的身份、阶层问题有着非常硬核且透彻的实证研究。" },
+            { name: "周浥莽", fields: "历史社会学、经济社会学、计算社会科学", desc: "穿梭于历史深处的学术极客。擅长用最前沿的计算方法，去破解那些关于经济与社会演化的复杂puzzle。如果你渴望在海量数据中打捞出足以颠覆“既有解释”的隐秘机制，他就是你的完美搭档！" },
+            { name: "朱斌", fields: "教育社会学、组织社会学", desc: "教育与组织社会学的新锐，逻辑严密，模型精巧，实证论文的绝佳榜样。" },
+            { name: "赵晰", fields: "定量方法、数理社会学", desc: "思维极其冷静，擅长用最理性的模型去解构复杂的社会现象。" },
+            { name: "廖越", fields: "定量研究、社会结构", desc: "自带气场，方法论扎实，带你用最锐利的视角切入社会问题。" },
+            { name: "吴蕾", fields: "定量研究、社会不平等", desc: "逻辑自洽的完美主义者，对学术规范和论文逻辑有着极高的要求。" },
+            { name: "王子彧", fields: "社会机制、定量分析", desc: "极具分析精神的青年学者，喜欢拆解复杂的社会运作机制。" }
+        ],
+        "B": [
+            { name: "黄盈盈", fields: "性与性别社会学、身体社会学、定性方法", desc: "身体与田野的先锋！她鼓励你抛弃宏大的教条，深入田野最鲜活的边缘地带，去倾听那些无法被数据框定的真实生命体验。" },
+            { name: "富晓星", fields: "人类学、性与性别研究、残障研究", desc: "人类学视角的温情叙事者，对边缘群体和微观世界有极强的共情力，擅长捕捉那些隐秘的社会痛点。" },
+            { name: "张慧", fields: "情感社会学、社会人类学", desc: "对微观情感有绝佳的洞察。她能带你从“嫉妒”、“面子”等日常情感中，剖析出深刻的社会结构运作机制。" },
+            { name: "祝玉红", fields: "性别与婚姻家庭", desc: "深耕私人领域的社会学解析，细致入微，擅长指导学生从最日常的家庭琐事中提炼出性别政治的理论议题。" },
+            { name: "庄皓琰", fields: "文化社会学、定性研究", desc: "具有极高的理论敏锐度，擅长指导你在日常生活的微小互动与文化符号中，捕捉深层的社会学意义。" },
+            { name: "李荷", fields: "微观社会学、城市生活研究", desc: "洞察力惊人，注重在庞杂的现代都市现象中，敏锐捕捉到个体的生存处境与应对策略。" },
+            { name: "吕楠", fields: "社会福利、弱势群体", desc: "关注社会福利与弱势群体，研究风格如水般温润而有力量。" },
+            { name: "王篪", fields: "文化社会学、微观社会学", desc: "充满理想主义色彩，擅长从文化和心理的微观层面理解社会变迁。" },
+            { name: "王玉君", fields: "弱势群体、人文关怀", desc: "具有深切的人文关怀，常常在被忽视的社会角落里挖掘出厚重的学术价值。" },
+            { name: "徐硕", fields: "微观互动、质性研究", desc: "认真严谨的陪伴型导师，会帮你一点点理清研究思路中的死结。" },
+            { name: "苏筱", fields: "微观社会学、日常实践", desc: "温柔且细致，能耐心地指导你打磨论文的每一个细节。" }
+        ],
+        "C": [
+            { name: "张巍卓", fields: "社会学理论、西方社会思想史", desc: "理论的深度潜行者。如果你的志趣在于梳理思想史，喜欢啃经典，试图通过解决纯粹的理论性puzzle来推动学科发展，他会是绝佳导师。" },
+            { name: "黄家亮", fields: "社会学理论、法社会学", desc: "理论素养深厚。擅长引导学生如何将具体的法律或社会现象，上升到抽象的概念思辨层面。" },
+            { name: "王水雄", fields: "经济社会学、社会网络", desc: "拥有极其冷静的理性大脑，擅长剖析市场机制与社会结构的复杂互动，理论建构能力极强。" },
+            { name: "于显洋", fields: "组织社会学、社会结构", desc: "在组织理论等领域视角独特，学术讨论时常常一语中的，能迅速帮你澄清模糊的理论前设。" },
+            { name: "陈劲松", fields: "理论社会学、文化社会学", desc: "冷峻的学术观察者，结构清晰。他强调研究的逻辑自洽性，擅长带你拆解现有理论的逻辑漏洞。" },
+            { name: "麻博洋", fields: "理论社会学、计算社会科学", desc: "思维极其活跃且前沿，对新兴事物有着强烈的好奇心，能带你探索传统社会学理论与新方法的边界。" },
+            { name: "闻翔", fields: "劳动社会学、工业社会学", desc: "在劳动与工业社会学领域深耕，文字凝练，思想极具穿透力。" },
+            { name: "赵延东", fields: "社会网络、科学社会学", desc: "社会网络与科学社会学的弄潮儿，帮你理清复杂社会中的种种“强弱关系”。" },
+            { name: "张瑞辰", fields: "社会学理论、创新范式", desc: "充满锐气的青年力量，不畏惧挑战既有范式，敢于提出新的解释。" },
+            { name: "唐丽娜", fields: "社会学理论、文化分析", desc: "思维跳跃，不拘一格，总能用新奇的视角解读老旧的社会议题。" },
+            { name: "王智慧", fields: "宏观社会学、理论思辨", desc: "学术视野开阔，研究切入点极具大局观，适合有宏大志向的同学。" }
+        ],
+        "D": [
+            { name: "李迎生", fields: "社会工作、社会政策", desc: "社会工作领域的常青树。他强调学术的现实应用价值，如果你希望你的研究能直接解决具体的社会问题、推动政策改变，选他没错。" },
+            { name: "陈那波", fields: "组织社会学、公共治理", desc: "组织转型与公共治理的探索者。充满行动力，能带你穿透地方政府基层运作的复杂科层迷雾。" },
+            { name: "房莉杰", fields: "医学社会学、社会政策", desc: "扎根卫生政策领域，研究风格踏实且极具人文关怀，带你做既有理论深度又对社会有用的实务研究。" },
+            { name: "卫小将", fields: "社会工作、社区治理", desc: "社会工作领域的实干家。既有理论高度，又有极强的社会动员和落地能力。" },
+            { name: "刘谦", fields: "教育社会学、定性研究", desc: "极具亲和力的导师，亦师亦友。在教育政策等领域有深入研究，能给你强大的学术与情感支持。" },
+            { name: "张会平", fields: "社会政策、家庭研究", desc: "脚踏实地，在政策研究中极其注重经验证据的收集与干预实践的结合。" },
+            { name: "石磊", fields: "社会政策、实证操作", desc: "研究扎实，行动力强，擅长将抽象理论落地为具体的实证操作。" },
+            { name: "王阳", fields: "社会治理、创新实践", desc: "阳光且充满活力，学术思维极具发散性，能给你带来无限灵感。" }
+        ],
+        "E": [
+            { name: "陆益龙", fields: "农村社会学、法社会学", desc: "乡土中国与传统法律的守望者。低调务实，带你读懂真实的中国农村社会底色。" },
+            { name: "赵旭东", fields: "人类学、乡村社会学", desc: "人类学界的“大佬”，田野里的说书人。跟着他，你能深刻理解从费孝通一脉相承的本土学术脉络。" },
+            { name: "岳永逸", fields: "民俗学、民间文化、城市人类学", desc: "底层社会的游侠！草根视角的田野大师，带你领略泥土里的烟火气与被主流忽略的民间智慧。" },
+            { name: "张有春", fields: "医学人类学、应用人类学", desc: "医疗人类学的布道者，带你倾听疾病背后的社会隐喻与文化阵痛，田野功夫极其深厚。" },
+            { name: "奂平清", fields: "网络社会学、乡村社会学", desc: "视野跨越传统乡土与现代赛博空间，视角敏锐，总能在社会网络中发现意想不到的理论切入点。" },
+            { name: "林丹", fields: "社会人类学、定性方法", desc: "充满激情的青年学者，田野调查中的“社牛”，能教你如何迅速打破壁垒，获取最深度的田野资料。" },
+            { name: "王亚鹏", fields: "乡土社会、现实主义", desc: "敏锐的现象捕捉者，研究风格接地气，充满现实主义的张力。" }
+        ]
+    };
+
+    // ==========================================
+    // 问卷题库 (隐秘测试学术偏好)
+    // ==========================================
+    const questions = [
+        {
+            q: "当你构思一篇论文时，你认为一个【优秀的社会学研究】最核心的特质是什么？",
+            options: [
+                { text: "提出一个明确的经验性puzzle，并用严密的逻辑排他性地证明现有解释的漏洞。", score: {A:2, C:1} },
+                { text: "深入田野，呈现最真实的生命体验，哪怕它无法被抽象为普适的宏大规律。", score: {B:2, E:2} },
+                { text: "厘清核心概念的脉络，通过解决理论性puzzle来推进学科的基础思考。", score: {C:3} },
+                { text: "直击当前的社会痛点，提出切实可行的干预方案或政策建议。", score: {D:3} }
+            ]
+        },
+        {
+            q: "如果你获得了一大笔无限制的科研经费，你最想用来做什么？",
+            options: [
+                { text: "购买海量微观追踪数据，并搭建超强的算力模型。", score: {A:3, C:1} },
+                { text: "驻扎在某个城中村或边缘群体中，进行为期两年的民族志观察。", score: {B:2, E:2} },
+                { text: "飞遍全国，评估各地基层政府的创新治理项目和社区干预实效。", score: {D:3, A:1} },
+                { text: "待在书房，购买全球最全的历史档案和外文经典孤本。", score: {C:2, A:1} }
+            ]
+        },
+        {
+            q: "阅读文献时，什么样的理论推导会让你觉得最过瘾？",
+            options: [
+                { text: "复杂的因果链条被数学模型和控制变量完美验证。", score: {A:3} },
+                { text: "透过日常生活中的“小事”，看到了背后巨大的权力压迫与反抗。", score: {B:3, E:1} },
+                { text: "通过宏大的历史比较，找到了国家建构或社会转型的结构性密码。", score: {A:1, C:2, E:1} },
+                { text: "思想家们跨越时代的哲学对话与基础概念的重构。", score: {C:3} }
+            ]
+        },
+        {
+            q: "面对与你相左的“替代性理论”，你通常的态度是：",
+            options: [
+                { text: "寻找反例数据，用统计结果把它按在地上摩擦。", score: {A:3} },
+                { text: "认为理论本身无所谓对错，更关注该理论背后的话语霸权。", score: {B:2, C:1} },
+                { text: "在更抽象的逻辑层面上把它吸纳为自己理论的一个特例。", score: {C:3} },
+                { text: "不关心谁对谁错，我只关心哪个理论能更好地指导社会服务实践。", score: {D:3} }
+            ]
+        },
+        {
+            q: "在日常生活中，你观察社会的视角更偏向于：",
+            options: [
+                { text: "喜欢观察社会阶层、组织架构如何影响人们的资源分配。", score: {A:2, D:1} },
+                { text: "对性别、身体、情绪等微观个体的互动细节极为敏感。", score: {B:3} },
+                { text: "喜欢逛庙会、农村集市，对传统的乡土人情和民俗充满兴趣。", score: {E:3} },
+                { text: "总是试图用一些抽象的哲学/社会学词汇来重新定义日常现象。", score: {C:2, A:1} }
+            ]
+        },
+        {
+            q: "最后，你理想中导师和你交流的方式是：",
+            options: [
+                { text: "客观冷静，直接指出我模型或逻辑上的致命漏洞。", score: {A:2, C:1} },
+                { text: "温情陪伴，听我倾诉田野里的痛苦，帮我建立情感连接。", score: {B:2, D:1} },
+                { text: "天马行空，两人喝着茶一起脑洞大开，碰撞理论火花。", score: {C:2, E:1} },
+                { text: "务实高效，直接教我如何把调研报告写得让政府部门采纳。", score: {D:3} }
+            ]
+        },
+        {
+            q: "当你听到一个普遍接受的“社会常识”时，你的第一反应是：",
+            options: [
+                { text: "怀疑它存在样本偏差，想找个大型微观数据库跑个回归检验一下。", score: {A:3} },
+                { text: "好奇那些不符合这个“常识”的边缘群体，他们是如何自洽地生活的。", score: {B:3, E:1} },
+                { text: "思考这个“常识”是如何在特定的历史和权力结构中被建构出来的。", score: {C:3} },
+                { text: "分析这个“常识”在实际的基层治理或社会政策执行中会遇到什么阻碍。", score: {D:3} }
+            ]
+        },
+        {
+            q: "阅读一篇广受好评的顶级期刊实证论文时，你最先挑剔的地方通常是：",
+            options: [
+                { text: "它的内生性问题有没有处理干净？稳健性检验够不够？", score: {A:3} },
+                { text: "研究者是否过于高高在上，缺乏对被访者和自身位置的反身性思考（Reflexivity）？", score: {B:3, E:1} },
+                { text: "它的理论对话是否只是“贴标签”，有没有真正推进经典概念？", score: {C:3} },
+                { text: "这研究看着高大上，但对解决实际的社会问题到底有啥用？", score: {D:3} }
+            ]
+        },
+        {
+            q: "写论文遇到严重的“卡壳”（瓶颈期）时，你更倾向于用哪种方式寻找灵感？",
+            options: [
+                { text: "换几个控制变量或者尝试一种新的统计模型，看看跑出来的结果。", score: {A:3} },
+                { text: "重返田野，或者重新翻阅厚厚的访谈录音稿，找回现场的温度。", score: {B:2, E:2} },
+                { text: "放下手头的实证材料，去重读一遍马克思、韦伯或涂尔干的经典原著。", score: {C:3} },
+                { text: "找几个在一线实务部门（如社工机构、基层干部）工作的朋友聊聊现状。", score: {D:3} }
+            ]
+        },
+        {
+            q: "对你来说，学习社会学的终极意义更接近于：",
+            options: [
+                { text: "像自然科学家一样，发现人类社会运作的普遍规律与隐秘机制。", score: {A:3} },
+                { text: "看见具体的人，记录人类生存方式的多样性，为无声者发声。", score: {B:2, E:2} },
+                { text: "获得一种智识上的快感，能够清醒地看透现代社会的“铁笼”。", score: {C:3} },
+                { text: "知行合一，将理论转化为行动，切实推动社会环境的微小改变。", score: {D:3} }
+            ]
+        }
+    ];
+
+    // ==========================================
+    // 逻辑控制代码
+    // ==========================================
+    let userData = {};
+    let categoryScores = { A:0, B:0, C:0, D:0, E:0 };
+    let currentQ = 0;
+
+    function startQuiz() {
+        const zodiac = document.getElementById('input-zodiac').value;
+        const mbti = document.getElementById('input-mbti').value.trim().toUpperCase();
+        const blood = document.getElementById('input-blood').value;
+        const bazi = document.getElementById('input-bazi').value;
+
+        // 简单的MBTI校验 (4个字母)
+        if(!/^[E|I][S|N][T|F][J|P]$/.test(mbti) && !/^[A-Z]{4}$/.test(mbti)) {
+            document.getElementById('mbti-error').style.display = 'block';
+            return;
+        }
+        document.getElementById('mbti-error').style.display = 'none';
+
+        userData = { zodiac, mbti, blood, bazi };
+
+        document.getElementById('form-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if(currentQ >= questions.length) {
+            calculateResult();
+            return;
+        }
+
+        const qObj = questions[currentQ];
+        document.getElementById('quiz-progress').innerText = `${currentQ + 1} / ${questions.length}`;
+        document.getElementById('question-text').innerText = qObj.q;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        qObj.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => {
+                // 加分逻辑
+                for (const [cat, pts] of Object.entries(opt.score)) {
+                    categoryScores[cat] += pts;
+                }
+                currentQ++;
+                loadQuestion();
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    function calculateResult() {
+        // 1. 找到用户得分最高的大类的分数，用于计算基础百分比
+        let maxCatScore = Math.max(...Object.values(categoryScores));
+        if (maxCatScore === 0) maxCatScore = 1; // 防止除以0
+
+        // 【新增：你的私心专属彩蛋判定】
+        const isMyEasterEgg = (userData.zodiac === '白羊座' && 
+                                (userData.mbti === 'INTJ' || userData.mbti === 'INTP') && 
+                                userData.blood === 'O型' && 
+                                userData.bazi === '丁火');
+        
+        // 【新增：朋友们的专属彩蛋判定】
+        const isFriend1 = (userData.zodiac === '天秤座' && userData.mbti === 'ISTJ');
+        const isFriend2 = (userData.zodiac === '水瓶座'); // 只要是水瓶座就触发
+        const isFriend3 = (userData.zodiac === '天秤座' && userData.mbti === 'INTP');
+
+        // 2. 利用玄学数据进行“确定性随机”（哈希算法）
+        // 这样保证同一个同学（输入不变且选项不变）测出来的排行榜和百分比永远是一样的！
+        const hashString = userData.zodiac + userData.mbti + userData.blood + userData.bazi;
+        let baseHash = 0;
+        for (let i = 0; i < hashString.length; i++) {
+            baseHash = hashString.charCodeAt(i) + ((baseHash << 5) - baseHash);
+        }
+        baseHash = Math.abs(baseHash);
+
+        let allTeachersScores = [];
+
+        // 3. 为全部50位老师计算专属“契合度”
+        for (const [cat, teacherList] of Object.entries(teachers)) {
+            let catPoints = categoryScores[cat] || 0;
+            
+            teacherList.forEach(t => {
+                // 利用老师的名字和用户的玄学密码，混合生成一个 0-14 的随机波动值
+                let tHash = 0;
+                for (let i = 0; i < t.name.length; i++) { tHash = t.name.charCodeAt(i) + ((tHash << 5) - tHash); }
+                let combinedHash = Math.abs(baseHash ^ tHash);
+                let randomMod = (combinedHash % 15);
+                
+                // 核心算法：基础分（所在流派得分比例 * 75）+ 玄学波动分（0~14）+ 底分（6）
+                let finalPercentage = Math.floor((catPoints / maxCatScore) * 75) + randomMod + 6;
+                
+                // 【彩蛋执行】：触发所有私心彩蛋，强行拉高特定老师分数
+                if (isMyEasterEgg && (t.name === '冯仕政' || t.name === '周浥莽')) {
+                    finalPercentage = 96 + (randomMod % 4); // 你的专属：96% ~ 99%
+                } else if (isFriend1 && t.name === '黄家亮') {
+                    finalPercentage = 95 + (randomMod % 5); // 朋友1：天秤+ISTJ
+                } else if (isFriend2 && t.name === '王篪') {
+                    finalPercentage = 95 + (randomMod % 5); // 朋友2：水瓶
+                } else if (isFriend3 && t.name === '张巍卓') {
+                    finalPercentage = 95 + (randomMod % 5); // 朋友3：天秤+INTP
+                }
+
+                if (finalPercentage > 99) finalPercentage = 99; // 契合度不能超过99%
+
+                allTeachersScores.push({
+                    teacher: t,
+                    percentage: finalPercentage
+                });
+            });
+        }
+
+        // 4. 排序：按百分比从高到低排序
+        allTeachersScores.sort((a, b) => b.percentage - a.percentage);
+
+        // 5. 提取前5名，榜首即为“天选导师”
+        const top5 = allTeachersScores.slice(0, 5);
+        const topMatch = top5[0].teacher;
+
+        // 6. 生成专属玄学判词
+        const insightText = `星盘解析：当 ${userData.blood} 的 ${userData.mbti} 能量遇见 ${userData.bazi} 日主，你的学术磁场呈现出强烈的特异性。系统察觉到你的思考方式最契合特定的社会学范式，以下是为你生成的专属导师排行榜：`;
+
+        // 7. 渲染结果页UI
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+
+        document.getElementById('metaphysics-insight').innerText = insightText;
+        document.getElementById('res-name').innerText = topMatch.name + " 老师";
+        document.getElementById('res-fields').innerText = "📚 代表领域：" + topMatch.fields;
+        document.getElementById('res-desc').innerText = topMatch.desc;
+
+        // 8. 渲染排行榜列表
+        const rankingListEl = document.getElementById('ranking-list');
+        rankingListEl.innerHTML = '';
+        top5.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.className = 'ranking-item';
+            
+            // 第一名加个皇冠图标
+            const rankText = index === 0 ? `👑 1. ${item.teacher.name}` : `${index + 1}. ${item.teacher.name}`;
+            
+            li.innerHTML = `
+                <span class="rank-name">${rankText}</span>
+                <span class="rank-score">契合度 ${item.percentage}%</span>
+            `;
+            rankingListEl.appendChild(li);
+        });
+    }
+
+    // 新增：分享按钮功能（网页环境限制，通常通过提示截图来实现）
+    function shareResult() {
+        alert("请长按或截图保存当前页面，去朋友圈秀出你的天选导师排行榜吧！");
+    }
+
+</script>
+</body>
+</html>
